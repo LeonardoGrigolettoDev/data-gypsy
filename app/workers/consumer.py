@@ -17,5 +17,4 @@ def start_kafka_consumer():
         xml_data = message.value
         xml_path = xml_data['file_path']
         
-        # Processar o XML
         process_xml(xml_path)
