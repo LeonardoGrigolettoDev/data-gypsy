@@ -1,5 +1,5 @@
 from lxml import etree
-from .database import save_to_mongodb
+from .mongo import save_to_mongodb
 
 
 def process_xml(xml_path):

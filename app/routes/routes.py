@@ -32,6 +32,7 @@ def insert_postgres():
     session.commit()
     return jsonify({"message": "Data inserted successfully!"}), 200
 
+
 # Exemplo de rota para enviar dados para Kafka
 
 
@@ -44,19 +45,15 @@ def insert_postgres():
 
 @data_blueprint.route('/upload', methods=['POST'])
 def upload_file():
-    zip_file = request.files['file']
-
-    if zip_file and zip_file.filename.endswith('.zip'):
-        # Criar diretório temporário para armazenar os XMLs extraídos
-        with tempfile.TemporaryDirectory() as tmpdir:
-            zip_path = os.path.join(tmpdir, zip_file.filename)
-            zip_file.save(zip_path)
-
-            # Descompactar o ZIP
-            extract_zip(zip_path, tmpdir)
-
-            # Enfileirar os XMLs no Kafka
-            enqueue_xml_to_kafka(tmpdir)
-
-        return "Arquivo processado com sucesso", 200
-    return "Arquivo ZIP inválido", 400
+    file = request.files['file']
+    if not file:
+        return "Arquivo ZIP inválido", 400
+    if file:
+        match(file):
+            case file.filename.endswith('.zip'):
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    zip_path = os.path.join(tmpdir, file.filename)
+                file.save(zip_path)
+                extract_zip(zip_path, tmpdir)
+                enqueue_xml_to_kafka(tmpdir)
+                return "Arquivo processado com sucesso", 200

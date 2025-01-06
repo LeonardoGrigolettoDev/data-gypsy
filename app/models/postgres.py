@@ -1,15 +1,30 @@
 # app/models/postgres.py
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from app.config import Config
+import psycopg2
+import logging
+from models import DB_CONFIG
 
-def get_postgres_engine():
-    engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
-    return engine
+from psycopg2 import pool
 
-def get_postgres_session():
-    engine = get_postgres_engine()
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    return session
+connection_pool = pool.SimpleConnectionPool(
+    minconn=1,
+    maxconn=10,
+    **DB_CONFIG
+)
+
+def get_pooled_connection():
+    try:
+        conn = connection_pool.getconn()
+        logging.info("Conexão adquirida do pool.")
+        return conn
+    except Exception as e:
+        logging.error(f"Erro ao adquirir conexão do pool: {e}")
+        raise
+
+def release_connection(conn):
+    try:
+        connection_pool.putconn(conn)
+        logging.info("Conexão devolvida ao pool.")
+    except Exception as e:
+        logging.error(f"Erro ao devolver conexão ao pool: {e}")
+        
