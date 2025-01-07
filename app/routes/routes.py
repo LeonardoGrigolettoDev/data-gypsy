@@ -1,59 +1,31 @@
-from flask import Blueprint, request, jsonify
 import app
-import zipfile
-import os
-import tempfile
-from app.models.mongodb import get_mongo_db
-from app.models.postgres import get_postgres_session
-from app.models.kafka import enqueue_xml_to_kafka
-from ..utils.file import extract_zip
-data_blueprint = Blueprint("data", __name__)
+from app.models import PostgreSQL, MongoDB
+from flask import request, jsonify, Blueprint
 
-# Exemplo de rota para inserir dados no MongoDB
+general_routes = Blueprint('general_routes', __name__)
 
-
-@data_blueprint.route("/insert_mongo", methods=["POST"])
-def insert_mongo():
-    data = request.json
-    db = get_mongo_db()
-    collection = db["data_collection"]
-    collection.insert_one(data)
-    return jsonify({"message": "Data inserted successfully!"}), 200
-
-# Exemplo de rota para inserir dados no PostgreSQL
-
-
-@data_blueprint.route("/insert_postgres", methods=["POST"])
-def insert_postgres():
-    data = request.json
-    session = get_postgres_session()
-    session.execute(
-        "INSERT INTO my_table (data) VALUES (:data)", {"data": data})
-    session.commit()
-    return jsonify({"message": "Data inserted successfully!"}), 200
-
-
-# Exemplo de rota para enviar dados para Kafka
-
-
-# @data_blueprint.route("/send_kafka", methods=["POST"])
-# def send_kafka():
-#     data = request.json
-#     send_message_to_kafka("my_topic", str(data))
-#     return jsonify({"message": "Message sent to Kafka!"}), 200
-
-
-@data_blueprint.route('/upload', methods=['POST'])
+@general_routes.route('/upload_file', methods=['POST'])
 def upload_file():
     file = request.files['file']
     if not file:
-        return "Arquivo ZIP inválido", 400
-    if file:
-        match(file):
-            case file.filename.endswith('.zip'):
-                with tempfile.TemporaryDirectory() as tmpdir:
-                    zip_path = os.path.join(tmpdir, file.filename)
-                file.save(zip_path)
-                extract_zip(zip_path, tmpdir)
-                enqueue_xml_to_kafka(tmpdir)
-                return "Arquivo processado com sucesso", 200
+        return "File is not valid.", 400
+    match(file):
+        case file.filename.endswith('.zip'):
+            return "Not implemented (ZIP)", 200
+        case file.filename.endswith('.csv'):
+            return "Not implemented (CSV)", 200
+
+@general_routes.route('/health', methods=['GET'])
+def health():
+    # Verificando a conexão com o PostgreSQL
+    postgres_db = PostgreSQL()
+    if not postgres_db.check_connection():
+        return jsonify({"status": "fail", "message": "PostgreSQL connection failed"}), 500
+
+    # Verificando a conexão com o MongoDB
+    mongo_db = MongoDB()
+    if not mongo_db.check_connection():
+        return jsonify({"status": "fail", "message": "MongoDB connection failed"}), 500
+
+    # Se todas as conexões estiverem ok
+    return jsonify({"status": "success", "message": "API is healthy"}), 200

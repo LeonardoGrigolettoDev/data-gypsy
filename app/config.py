@@ -1,12 +1,12 @@
-# app/config.py
+# config.py
+import os
 
 class Config:
-    # MongoDB Configuration
-    MONGO_URI = "mongodb://root:password@localhost:27017/my_database"
-    
-    # PostgreSQL Configuration
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:password@localhost:5432/my_database"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    
-    # Kafka Configuration
-    KAFKA_BROKER_URL = "localhost:9092"
+    POSTGRES_USER = os.getenv("POSTGRES_USER")
+    POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+    POSTGRES_DB = os.getenv("POSTGRES_DB")
+    POSTGRES_HOST = os.getenv("POSTGRES_HOST")
+    POSTGRES_PORT = os.getenv("POSTGRES_PORT")
+    MONGO_HOST = os.getenv("MONGO_HOST")
+    MONGO_DB = os.getenv("MONGO_DB")
+    MONGO_PORT = os.getenv("MONGO_PORT")
