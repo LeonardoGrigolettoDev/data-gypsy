@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, Blueprint
-from app.models import MongoDB
+from app.db import MongoDB
 from bson.objectid import ObjectId
 
 mongo_routes = Blueprint('mongo_routes', __name__)

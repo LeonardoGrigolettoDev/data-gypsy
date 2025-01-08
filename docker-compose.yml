@@ -1,55 +1,18 @@
-version: "3.8"
+version: '3.9'
 
 services:
-  # MongoDB Service
-  mongodb:
-    image: mongo:6.0
-    container_name: mongodb
-    restart: always
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
-
-  # PostgreSQL Service
   postgres:
-    image: postgres:15
-    container_name: postgres
+    image: postgres:latest
+    container_name: postgres_db
     restart: always
     ports:
-      - "5432:5432"
+      - "5432:5432" # Mapeia a porta local para o container
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: my_database
+      POSTGRES_USER: postgres     # Substitua pelo nome de usuário desejado
+      POSTGRES_PASSWORD: password # Substitua pela senha desejada
+      POSTGRES_DB: postgres       # Nome do banco de dados inicial
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  # Zookeeper (Kafka Dependency)
-  kafka:
-    image: wurstmeister/kafka
-    environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
-      KAFKA_LISTENER_NAMES: INSIDE
-      KAFKA_LISTENER_DEFAULT: INSIDE
-      KAFKA_LISTENER_INTERNAL: INSIDE
-      KAFKA_LISTENER_PORT: 9093
-      KAFKA_LISTENER_NAME: INSIDE
-      KAFKA_LISTENER_INTERNAL_PORT: 9093
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    ports:
-      - "9093:9093"
-    depends_on:
-      - zookeeper
-  zookeeper:
-    image: wurstmeister/zookeeper
-    ports:
-      - "2181:2181"
+      - postgres_data:/var/lib/postgresql/data # Persistência dos dados
 
 volumes:
-  mongodb_data:
   postgres_data:

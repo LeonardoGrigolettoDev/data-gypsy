@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, Blueprint
-from app.models import PostgreSQL
+from app.db import PostgreSQL
 
 postgres_routes = Blueprint('postgres_routes', __name__)
 

@@ -1,5 +1,4 @@
-import app
-from app.models import PostgreSQL, MongoDB
+from app.db import PostgreSQL, MongoDB
 from flask import request, jsonify, Blueprint
 
 general_routes = Blueprint('general_routes', __name__)

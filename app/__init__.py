@@ -1,7 +1,6 @@
 # app/__init__.py
 
 from flask import Flask
-from app.config import Config
 
 
 def create_app():
@@ -14,3 +13,19 @@ def create_app():
     app.register_blueprint(postgres_routes, url_prefix='/postgres')
     app.register_blueprint(general_routes)
     return app
+
+import os
+
+class Config:
+    POSTGRES_USER = os.getenv("POSTGRES_USER")
+    POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+    POSTGRES_DB = os.getenv("POSTGRES_DB")
+    POSTGRES_HOST = os.getenv("POSTGRES_HOST")
+    POSTGRES_PORT = os.getenv("POSTGRES_PORT")
+    POSTGRES_ROOT_USER = os.getenv("POSTGRES_ROOT_USER")
+    POSTGRES_ROOT_PASSWORD = os.getenv("POSTGRES_ROOT_PASSWORD")
+    MONGO_HOST = os.getenv("MONGO_HOST")
+    MONGO_DB = os.getenv("MONGO_DB")
+    MONGO_PORT = os.getenv("MONGO_PORT")
+
+config = Config()
