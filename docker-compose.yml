@@ -1,19 +1,13 @@
-version: '3.9'
-
+version: '3.8'
 services:
   mongodb:
-    image: mongo:6.0     # Use a versão desejada do MongoDB
+    image: mongo:6.0
     container_name: mongodb
-    restart: always
-    ports:
-      - "27017:27017"    # Expondo a porta padrão do MongoDB
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin    # Usuário root para autenticação
-      MONGO_INITDB_ROOT_PASSWORD: password # Senha do usuário root
+      MONGO_INITDB_DATABASE: mongodb
+    ports:
+      - "27017:27017"
     volumes:
-      - mongo_data:/data/db               # Persistência dos dados
-      - mongo_config:/data/configdb       # Persistência das configurações
-
+      - mongo_data:/data/db
 volumes:
-  mongo_data:  # Volume para os dados do MongoDB
-  mongo_config: # Volume para configurações internas do MongoDB
+  mongo_data:

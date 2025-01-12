@@ -6,18 +6,36 @@ class Cli:
     ...
 
 
-class MongoDB:
+class MongoDB(MongoClient):
     def __init__(self):
         try:
+            # Certifique-se de que as variáveis de ambiente estão corretas
             mongo_host = os.getenv("MONGO_HOST")
             mongo_port = os.getenv("MONGO_PORT")
             mongo_database = os.getenv("MONGO_DB")
-            
-            # Conectando ao MongoDB
-            self.client = MongoClient(mongo_host, int(mongo_port))
+            mongo_username = os.getenv("MONGO_ROOT_USERNAME")
+            mongo_password = os.getenv("MONGO_ROOT_PASSWORD")
+            mongo_auth = os.getenv("AUTH_SOURCE", "admin")  # Fonte de autenticação
+
+            uri = f"mongodb://{mongo_username}:{mongo_password}@{mongo_host}:{mongo_port}/{mongo_database}?authSource={mongo_auth}"
+            self.client = MongoClient(uri)
             self.db = self.client[mongo_database]
+            print(f"Conectado ao banco de dados: {mongo_database}")
+            print(self.client.list_database_names())
+            self.initialize_essential_collections()
+            
         except Exception as e:
             raise Exception(f"Erro ao conectar ao MongoDB: {str(e)}")
+        
+    def initialize_essential_collections(self):
+        current_collections = self.db.list_collection_names()
+        essencial = ['users', 'documents', 'analysts', 'models']
+        for c in essencial:
+            if not c in current_collections:
+                self.db.create_collection(c)
+
+        
+
 
     def get_all(self, collection_name):
         """Obtém todos os documentos de uma coleção."""
@@ -101,4 +119,19 @@ class MongoDB:
             return True
         except Exception as e:
             return False
-        
+
+    def initialize_database(self):
+        pass
+
+    # def initialize_collections(self):
+    #     collections_names = ['User']
+    #     # Verificando se a coleção existe
+    #     for c in collections_names:
+    #         if c not in self.db.list_collection_names():
+    #             print(f"Criando coleção '{c}'...")
+    #             self.db.create_collection(c)
+    #         else:
+    #             print(f"A coleção '{c}' já existe.")
+
+    #     # Fechando a conexão
+    #     self.db.close()

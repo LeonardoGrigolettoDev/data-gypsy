@@ -6,7 +6,7 @@ mongo_routes = Blueprint('mongo_routes', __name__)
 
 
 @mongo_routes.route('/<collection_name>/', methods=['GET'])
-def get_all(collection_name=None):
+def get_all(collection_name=None, filters=None):
     try:
         db = MongoDB()
         data = db.get_all(collection_name)
