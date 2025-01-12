@@ -1,18 +1,19 @@
 version: '3.9'
 
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgres_db
+  mongodb:
+    image: mongo:6.0     # Use a versão desejada do MongoDB
+    container_name: mongodb
     restart: always
     ports:
-      - "5432:5432" # Mapeia a porta local para o container
+      - "27017:27017"    # Expondo a porta padrão do MongoDB
     environment:
-      POSTGRES_USER: postgres     # Substitua pelo nome de usuário desejado
-      POSTGRES_PASSWORD: password # Substitua pela senha desejada
-      POSTGRES_DB: postgres       # Nome do banco de dados inicial
+      MONGO_INITDB_ROOT_USERNAME: admin    # Usuário root para autenticação
+      MONGO_INITDB_ROOT_PASSWORD: password # Senha do usuário root
     volumes:
-      - postgres_data:/var/lib/postgresql/data # Persistência dos dados
+      - mongo_data:/data/db               # Persistência dos dados
+      - mongo_config:/data/configdb       # Persistência das configurações
 
 volumes:
-  postgres_data:
+  mongo_data:  # Volume para os dados do MongoDB
+  mongo_config: # Volume para configurações internas do MongoDB

@@ -1,4 +1,4 @@
-from app.db import PostgreSQL, MongoDB
+from app.db import MongoDB
 from flask import request, jsonify, Blueprint
 
 general_routes = Blueprint('general_routes', __name__)
@@ -16,11 +16,6 @@ def upload_file():
 
 @general_routes.route('/health', methods=['GET'])
 def health():
-    # Verificando a conexão com o PostgreSQL
-    postgres_db = PostgreSQL()
-    if not postgres_db.check_connection():
-        return jsonify({"status": "fail", "message": "PostgreSQL connection failed"}), 500
-
     # Verificando a conexão com o MongoDB
     mongo_db = MongoDB()
     if not mongo_db.check_connection():
