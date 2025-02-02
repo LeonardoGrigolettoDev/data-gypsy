@@ -1,25 +1,43 @@
-from app.db import MongoDB
 from flask import request, jsonify, Blueprint
-
+from app.models import Model
+import app.services.users as service_users
+import psycopg2.errors as pg_errors
 general_routes = Blueprint('general_routes', __name__)
 
-@general_routes.route('/upload_file', methods=['POST'])
-def upload_file():
-    file = request.files['file']
-    if not file:
-        return "File is not valid.", 400
-    match(file):
-        case file.filename.endswith('.zip'):
-            return "Not implemented (ZIP)", 200
-        case file.filename.endswith('.csv'):
-            return "Not implemented (CSV)", 200
+@general_routes.route('/data/load/<permission>', methods=['POST'])
+def upload_file(permission):
+    file = request.files.get('file')
+    if permission not in ['public', 'private']:
+        return {"message":'Param "permission" was not informed'}, 400
+    print(file.filename)
+    typeFile = file.filename.split('.')[-1]
+    match typeFile:
+        case 'csv':
+            return {"message":'Data loaded successfully'}, 200
+            
+        case _:
+            return {"message":'Not implemented'}, 501
 
-@general_routes.route('/health', methods=['GET'])
-def health():
-    # Verificando a conexão com o MongoDB
-    mongo_db = MongoDB()
-    if not mongo_db.check_connection():
-        return jsonify({"status": "fail", "message": "MongoDB connection failed"}), 500
+@general_routes.route('/user', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    name = data.get('name')
+    permission = data.get('permission')
+    email = data.get('email')
+    password = data.get('password')
+    if not name or not permission or not email or not password:
+        return {"message": "Could not find all params to create"}, 400
+    try:
+        created = service_users.create_user({
+            "name": name,
+            "permission": permission,
+            "email": email,
+            "password": password
+        })
+    except Exception as e:
+        return {"message": f"Could not create user: {e}"}, 400
+    else:
+        if isinstance(created, pg_errors.UniqueViolation):
+            return {"message": f"User already exists on DB"}, 200
+        return {"message": f"User created successfully"}, 201
 
-    # Se todas as conexões estiverem ok
-    return jsonify({"status": "success", "message": "API is healthy"}), 200

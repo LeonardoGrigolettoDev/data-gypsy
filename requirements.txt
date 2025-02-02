@@ -1,6 +1,7 @@
 Flask
-pymongo
 psycopg2-binary
 kafka-python
 lxml
 python-dotenv
+pyjwt
+bcrypt
