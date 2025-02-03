@@ -18,12 +18,19 @@ def execute_query(query, params=None):
         return {"error": "Could not connect to postgres"}
     try:
         query = query.strip().lower()
-        match query.split()[0]:  # Verifica o tipo da consulta usando a primeira palavra (tipo de query)
+        # Verifica o tipo da consulta usando a primeira palavra (tipo de query)
+        match query.split()[0]:
             case "select":
                 cur.execute(query, params)
                 result = cur.fetchall()
-                return result if result else []
-            
+                # Obtém os nomes das colunas
+                columns = [desc[0] for desc in cur.description]
+
+                # Transforma os resultados em dicionários { "coluna": valor }
+                data = [dict(zip(columns, row)) for row in result]
+
+                return data if data else []
+
             case "insert":
                 cur.execute(query, params)
                 conn.commit()
@@ -75,4 +82,3 @@ def create_table(table_name: str, schema: dict):
     except Exception as e:
         print(f"Erro ao criar tabela: {e}")
         return e
-

@@ -5,3 +5,4 @@ lxml
 python-dotenv
 pyjwt
 bcrypt
+pytest

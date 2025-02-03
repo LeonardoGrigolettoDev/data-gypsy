@@ -18,6 +18,23 @@ def upload_file(permission):
         case _:
             return {"message":'Not implemented'}, 501
 
+@general_routes.route('/login', methods=['POST'])
+def auth():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+    if not email or not password:
+        return {"message": "Missing params"}, 400
+    try:
+        found = service_users.auth_user(email, password)
+    except Exception as e:
+        return {"message": f"Unable to authenticate user: {e}"}, 400
+    else:
+        if not found:
+            return {"message": "Incorrect authentication"}, 401
+        return {"message": {"id": found}}, 200
+
+
 @general_routes.route('/user', methods=['POST'])
 def create_user():
     data = request.get_json()
