@@ -28,14 +28,17 @@ def execute_query(query, params=None):
 
                 # Transforma os resultados em dicionários { "coluna": valor }
                 data = [dict(zip(columns, row)) for row in result]
-
-                return data if data else []
+                
+                return data[0] if len(data) == 1 else data
 
             case "insert":
-                cur.execute(query, params)
-                conn.commit()
-                result = cur.fetchone()
-                return result
+                try:
+                    cur.execute(query, params)
+                    conn.commit()
+                    result = cur.fetchone()
+                    return result
+                except Exception as e:
+                    print(e)
 
             case "update":
                 cur.execute(query, params)

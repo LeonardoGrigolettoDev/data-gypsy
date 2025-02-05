@@ -31,8 +31,8 @@ def create_users_table():
             "permission": "VARCHAR(100) REFERENCES permissions(name) ON DELETE CASCADE",
             "name": "VARCHAR(100) NOT NULL",
             "email": "VARCHAR(100) UNIQUE NOT NULL",
-            "password": "VARCHAR(100) UNIQUE NOT NULL",
-            "salt": "VARCHAR(100) UNIQUE NOT NULL",
+            "password": "VARCHAR(255) UNIQUE NOT NULL",
+            #"salt": "VARCHAR(100) UNIQUE NOT NULL",
             "created_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
             "updated_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP "
         })

@@ -1,22 +1,24 @@
 from app.models import Model
-from app.utils.encrypt import (encrypt, check_encrypt)
-
+from  app.services import (check_password, encrypt_password)
 
 def auth_user(email: str, password: str):
     table = Model("users")
-    has_user = table.read(filters={'email': email})
-    if not len(has_user):
-        return has_user 
-    has_user = has_user[0]
-    auth = check_encrypt(password, has_user['password'])
+    found = table.read(filters={'email': email})
+    if not found:
+        return False 
+    pwd = found['password']
+    auth = check_password(password, pwd)
+    print(f"Senha armazenada no banco: {found['password']}")
+    print(auth)
     if not auth:
         return auth
     
-    return {**has_user, "password": None}
+    return {**found, "password": None}
 
 
 def create_user(user: dict):
     table = Model("users")
-    encrypted, salt = encrypt(user['password'])
-    user = {**user, 'password': encrypted, 'salt': salt}
+    print(user['password'])
+    encrypted = encrypt_password(user['password'])
+    user = {**user, 'password': encrypted}
     return table.insert(user)
